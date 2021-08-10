@@ -6,8 +6,6 @@ import PerfectScrollbar from 'perfect-scrollbar';
 import 'perfect-scrollbar/css/perfect-scrollbar.css';
 // @material-ui/core components
 import withStyles from '@material-ui/core/styles/withStyles';
-// core components
-import Navbar from '../components/Navbars/Navbar';
 
 import dashboardStyle from '../assets/jss/material-dashboard-react/layouts/dashboardStyle';
 
@@ -16,7 +14,7 @@ const image = ''
 import logo from '../assets/img/reactlogo.png';
 import { APIService } from '../services/api';
 
-import Home from './Home'
+import EnhancedTable from './EnhancedTable'
 const api = new APIService();
 
 interface Props extends RouteComponentProps {
@@ -140,11 +138,10 @@ class Dashboard extends React.Component<Props, State> {
     return (
       <div className={classes.wrapper}>
         <div className={classes.mainPanel} ref="mainPanel">
-          <Navbar {...rest} />
           <div className={classes.content}>
             <div className={classes.container}>
               <Switch>
-                <Route path="/" component={Home} />
+                <Route path="/" component={EnhancedTable} />
                 <Redirect exact from="/admin" to="/admin/" />
               </Switch>
             </div>

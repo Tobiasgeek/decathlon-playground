@@ -6,7 +6,6 @@ import InputLabel from '@material-ui/core/InputLabel'
 import GridItem from '../../components/Grid/GridItem'
 import GridContainer from '../../components/Grid/GridContainer'
 import CustomInput from '../../components/CustomInput/CustomInput'
-import Button from '../../components/CustomButtons/Button'
 import Card from '../../components/Card/Card'
 import CardHeader from '../../components/Card/CardHeader'
 import CardAvatar from '../../components/Card/CardAvatar'
@@ -17,6 +16,7 @@ import { createStyles, Typography } from '@material-ui/core'
 import { Link, RouteComponentProps, withRouter } from 'react-router-dom'
 
 import { APIService } from '../../services/api'
+import { Button } from '@material-ui/core';
 
 const api = new APIService()
 
@@ -153,7 +153,7 @@ class Login extends React.Component<Props, State> {
                 <GridContainer>
                   <GridItem xs={12} sm={12} md={12}>
                     <CustomInput
-                      labelText="Password"
+                      labelText="Personal Access Token"
                       id="password"
                       formControlProps={{
                         fullWidth: true
