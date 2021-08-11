@@ -81,6 +81,16 @@ function stableSort<T>(array: T[], comparator: (a: T, b: T) => number) {
   return stabilizedThis.map((el) => el[0]);
 }
 
+function filterData(array:any[], condition:any) {
+  let _temp:any[] = []
+  if(condition.length>0) {
+    array.map((v:any, i:any, l:any)=>{ if(v.name) if(new RegExp(condition, "i").test(v.name)) _temp.push(v) })
+  }else{
+    _temp = array
+  }
+  return _temp
+}
+
 interface HeadCell {
   id: keyof Data;
   label: string;
@@ -175,24 +185,25 @@ const useToolbarStyles = makeStyles((theme: Theme) =>
 );
 interface EnhancedTableToolbarProps {
   numSelected: number;
+  updateFilter(e:any): any;
 }
 
 const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
   const [showFilterTab, setFilterTab] = React.useState(false);
-  const [filter, setFilter] = React.useState("");
   const classes = useToolbarStyles();
-  const { numSelected } = props;
+  const { numSelected, updateFilter } = props;
 
   const showFilters = (e:any)=>{
     setFilterTab(!showFilterTab)
   }
+  const changeFilter = (e:any)=>{
+    updateFilter(e)
+  }
 
   return (
-    <Toolbar
-      className={clsx(classes.root, {
+    <Toolbar className={clsx(classes.root, {
         [classes.highlight]: numSelected > 0,
-      })}
-    >
+      })}>
       <Typography className={classes.title} variant="h6" id="tableTitle" component="div">
         Repositories
       </Typography>
@@ -204,19 +215,19 @@ const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
           <FilterListIcon />
         </IconButton>
       </Tooltip>
-      {showFilterTab?<CustomInput
-        labelText="Search:"
-        id="filter"
-        formControlProps={{
-          fullWidth: true
-        }}
-        inputProps={{
-          type:"filter",
-          onChange:(e:any)=>{ setFilter(e.currentTarget.value) },
-          onBlur:(e:any)=>{ setFilter(e.currentTarget.value) }
-        }}
-      />:null}
-      
+      {showFilterTab?
+        <CustomInput
+          labelText="Search by name:"
+          id="filter"
+          formControlProps={{
+            fullWidth: true
+          }}
+          inputProps={{
+            type:"filter",
+            onChange:(e:any)=>{ changeFilter(e.currentTarget.value) },
+            onBlur:(e:any)=>{ changeFilter(e.currentTarget.value) }
+          }}
+        />:null}
     </Toolbar>
   )
 }
@@ -250,6 +261,7 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function EnhancedTable() {
   const classes = useStyles();
   const [order, setOrder] = React.useState<Order>('asc');
+  const [condition, setConditions] = React.useState<string>("");
   const [rows, setRows] = React.useState<Data[]>([]);
   const [orderBy, setOrderBy] = React.useState<keyof Data>('created_at');
   const [selected, setSelected] = React.useState<string[]>([]);
@@ -314,11 +326,16 @@ export default function EnhancedTable() {
         }).catch(err=>console.error(err))
     }
 
+    const handleFilter = (e:any) => {
+      console.log("handleFilter", e)
+      setConditions(e)
+    }
+
     return (
     <div className={classes.root}>
         <Typography variant="h4">Decathlon</Typography>
         <Paper className={classes.paper}>
-          <EnhancedTableToolbar numSelected={selected.length} />
+          <EnhancedTableToolbar numSelected={selected.length} updateFilter={handleFilter} />
           <TableContainer>
               <Table
               className={classes.table}
@@ -336,7 +353,7 @@ export default function EnhancedTable() {
                   rowCount={rows.length}
               />
               <TableBody>
-                  {rows.length==0?null:stableSort(rows, getComparator(order, orderBy))
+                  {rows.length==0?null:stableSort(filterData(rows, condition), getComparator(order, orderBy))
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row:any, index) => {
                       const isItemSelected = isSelected(row.name)
